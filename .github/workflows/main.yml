@@ -41,7 +41,7 @@ jobs:
         
     # ========== DEPLOY TO SERVER ==========
     - name: Deploy to Server
-      uses: appleboy/scp-action@v0.1.4
+      uses: appleboy/scp-action@v1
       with:
         host: 192.168.1.107
         username: ${{ secrets.SSH_USERNAME }}
