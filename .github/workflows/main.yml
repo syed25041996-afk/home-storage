@@ -3,8 +3,6 @@ name: Deploy to Server
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -23,86 +21,82 @@ jobs:
     # ========== ANGULAR BUILD ==========
     - name: Install Angular dependencies
       run: |
-        cd home-backup || true
+        cd home-backup
         npm ci
         
     - name: Build Angular application
       run: |
-        cd home-backup || true
+        cd home-backup
         npm run build -- --configuration=production
       env:
         NODE_OPTIONS: '--max_old_space_size=4096'
         
-    # ========== NODE.JS BACKEND BUILD ==========
-    - name: Install Node.js API dependencies
+    # ========== CREATE SSH KEY ==========
+    - name: Setup SSH Key
       run: |
-        cd home-backup-api || true
-        npm ci --only=production
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 192.168.1.107 >> ~/.ssh/known_hosts
         
-    # ========== DEPLOY TO SERVER ==========
-    - name: Deploy to Server
-      uses: appleboy/scp-action@v1
-      with:
-        host: 192.168.1.107
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22
-        source: "home-backup/dist/,home-backup-api/"
-        target: "/home/webapp/home-storage/"
-        strip_components: 1
-        overwrite: true
+    # ========== DEPLOY FILES ==========
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy/angular
+        mkdir -p deploy/api
         
-    - name: Setup Server Dependencies and Start
-      uses: appleboy/ssh-action@v0.1.5
-      with:
-        host: 192.168.1.107
-        username: ${{ secrets.SSH_USERNAME }}
-        password: 1234
-        script: |
-          cd /home/webapp/home-storage/
+        # Copy Angular build
+        cp -r home-backup/dist/browser/* deploy/angular/
+        
+        # Copy Node.js API
+        cp -r home-backup-api/* deploy/api/
+        
+        # Create deployment script
+        cat > deploy/deploy.sh << 'EOF'
+        #!/bin/bash
+        echo "Starting deployment..."
+        
+        # Create directories on server
+        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "mkdir -p /home/webapp/home-storage/angular"
+        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "mkdir -p /home/webapp/home-storage/api"
+        
+        # Copy Angular files
+        echo "Deploying Angular files..."
+        scp -i ~/.ssh/id_rsa -r deploy/angular/* ${{ secrets.SSH_USERNAME }}@192.168.1.107:/home/webapp/home-storage/angular/
+        
+        # Copy API files
+        echo "Deploying API files..."
+        scp -i ~/.ssh/id_rsa -r deploy/api/* ${{ secrets.SSH_USERNAME }}@192.168.1.107:/home/webapp/home-storage/api/
+        
+        # Install and restart API
+        echo "Installing API dependencies..."
+        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 << 'DEPLOY_SCRIPT'
+          cd /home/webapp/home-storage/api
+          npm install --only=production
           
-          # Install API dependencies on server
-          cd home-backup-api
-          npm install --production
-          
-          # Setup PM2 for process management
-          if ! command -v pm2 &> /dev/null; then
-            npm install -g pm2
+          # Start/Restart the API with PM2
+          if command -v pm2 &> /dev/null; then
+            pm2 delete home-backup-api 2>/dev/null || true
+            pm2 start server.js --name "home-backup-api"
+            pm2 save
+          else
+            # If PM2 not installed, run directly
+            pkill -f "node.*server.js" 2>/dev/null || true
+            nohup node server.js > app.log 2>&1 &
           fi
-          
-          # Start/Restart the Node.js API
-          pm2 delete home-backup-api 2>/dev/null || true
-          pm2 start server.js --name "home-backup-api"
-          pm2 save
-          pm2 startup
-          
-          # Configure Nginx for Angular app (if needed)
-          echo "Setting up web server..."
-          
-          # Create or update Nginx config
-          sudo bash -c 'cat > /etc/nginx/sites-available/home-storage << EOF
-          server {
-              listen 80;
-              server_name 192.168.1.107;
-              
-              location /api {
-                  proxy_pass http://localhost:3000;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection "upgrade";
-                  proxy_set_header Host \$host;
-                  proxy_cache_bypass \$http_upgrade;
-              }
-              
-              location / {
-                  root /var/www/home-storage/home-backup/dist/browser;
-                  try_files \$uri \$uri/ /index.html;
-                  index index.html index.htm;
-              }
-          }
-          EOF'
-          
-          # Enable site
-          sudo ln -sf /etc/nginx/sites-available/home-storage /etc/nginx/sites-enabled/
-          sudo nginx -t
-          sudo systemctl restart nginx
+        DEPLOY_SCRIPT
+        
+        echo "Deployment completed!"
+        EOF
+        
+        chmod +x deploy/deploy.sh
+        
+    - name: Deploy to Server
+      run: |
+        ./deploy/deploy.sh
+        
+    # ========== VERIFY DEPLOYMENT ==========
+    - name: Verify Deployment
+      run: |
+        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "ls -la /home/webapp/home-storage/"
+        echo "Deployment successful!"
