@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '20' # Use a Node.js version compatible with your projects
 
-      # --- Frontend: Angular Build ---
+      # --- Frontend: Angular Build ----
       - name: 📦 Install Frontend Dependencies
         run: npm ci
         working-directory: ./home-backup
