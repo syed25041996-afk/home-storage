@@ -1,0 +1,204 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FileUploadComponent } from './file-upload.component';
+
+interface FileItem {
+  name: string;
+  size: string;
+  uploadedAt: string;
+  type: string;
+}
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FileUploadComponent],
+  template: `
+    <div class="min-h-screen bg-gray-50">
+      <!-- Header -->
+      <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-6">
+            <div class="flex items-center">
+              <h1 class="text-2xl font-bold text-gray-900">Family File Storage</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm text-gray-700">Welcome, {{ currentUser() }}</span>
+              <button
+                (click)="logout()"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+          <!-- Stats Cards -->
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+              <div class="p-5">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div class="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt class="text-sm font-medium text-gray-500 truncate">Total Files</dt>
+                      <dd class="text-lg font-medium text-gray-900">{{ totalFiles() }}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+              <div class="p-5">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                  </div>
+                  <div class="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt class="text-sm font-medium text-gray-500 truncate">Storage Used</dt>
+                      <dd class="text-lg font-medium text-gray-900">{{ storageUsed() }}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+              <div class="p-5">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                    </svg>
+                  </div>
+                  <div class="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt class="text-sm font-medium text-gray-500 truncate">Family Members</dt>
+                      <dd class="text-lg font-medium text-gray-900">{{ familyMembers().length }}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+              <div class="p-5">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <div class="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt class="text-sm font-medium text-gray-500 truncate">Recent Uploads</dt>
+                      <dd class="text-lg font-medium text-gray-900">{{ recentUploads().length }}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- File Upload Section -->
+          <div class="bg-white shadow rounded-lg p-6 mb-8">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Upload New Files</h2>
+            <app-file-upload></app-file-upload>
+          </div>
+
+          <!-- Recent Files -->
+          <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            <div class="px-4 py-5 sm:px-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Files</h3>
+              <p class="mt-1 max-w-2xl text-sm text-gray-500">Your recently uploaded files</p>
+            </div>
+            <ul role="list" class="divide-y divide-gray-200">
+              <li *ngFor="let file of recentUploads()" class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ file.name }}</div>
+                      <div class="text-sm text-gray-500">{{ file.size }} • {{ file.uploadedAt }}</div>
+                    </div>
+                  </div>
+                  <div class="text-sm text-gray-500">{{ file.type }}</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Family Members -->
+          <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-md">
+            <div class="px-4 py-5 sm:px-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Family Members</h3>
+              <p class="mt-1 max-w-2xl text-sm text-gray-500">People who can access the storage</p>
+            </div>
+            <ul role="list" class="divide-y divide-gray-200">
+              <li *ngFor="let member of familyMembers()" class="px-4 py-4 sm:px-6">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                      <span class="text-sm font-medium text-white">{{ member.name.charAt(0) }}</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
+                    <div class="text-sm text-gray-500">{{ member.role }}</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+  `,
+  styles: []
+})
+export class DashboardComponent {
+  currentUser = signal('John Doe'); // In real app, get from auth service
+
+  totalFiles = signal(42);
+  storageUsed = signal('2.4 GB');
+
+  recentUploads = signal<FileItem[]>([
+    { name: 'family_photo.jpg', size: '2.1 MB', uploadedAt: '2 hours ago', type: 'Image' },
+    { name: 'vacation_video.mp4', size: '45.8 MB', uploadedAt: '1 day ago', type: 'Video' },
+    { name: 'recipe_document.pdf', size: '1.2 MB', uploadedAt: '3 days ago', type: 'Document' },
+    { name: 'birthday_card.png', size: '850 KB', uploadedAt: '1 week ago', type: 'Image' },
+  ]);
+
+  familyMembers = signal([
+    { name: 'John Doe', role: 'Admin' },
+    { name: 'Jane Doe', role: 'Member' },
+    { name: 'Alice Smith', role: 'Member' },
+    { name: 'Bob Johnson', role: 'Member' },
+  ]);
+
+  constructor(private router: Router) {}
+
+  logout() {
+    // In real app, clear auth tokens
+    this.router.navigate(['/login']);
+  }
+}
