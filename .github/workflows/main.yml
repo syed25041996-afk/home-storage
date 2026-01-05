@@ -1,105 +1,18 @@
-name: Deploy to Server
-
+name: 'Usage of scp-action GitHub Action'
 on:
-  push:
-    branches: [ main ]
-
+    push:
+        branches:
+            - main
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      
-    # - name: Setup Node.js
-    #   uses: actions/setup-node@v3
-    #   with:
-    #     node-version: '18'
-    #     cache: 'npm'
-        
-    # ========== ANGULAR BUILD ==========
-    - name: Install Angular dependencies
-      run: |
-        cd home-backup
-        npm ci
-        
-    - name: Build Angular application
-      run: |
-        cd home-backup
-        npm run build -- --configuration=production
-      env:
-        NODE_OPTIONS: '--max_old_space_size=4096'
-        
-    # ========== CREATE SSH KEY ==========
-    - name: Setup SSH Key
-      run: |
-        pwd
-        whoami
-        ssh webapp@192.168.1.107 
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 192.168.1.107 >> ~/.ssh/known_hosts
-        
-    # ========== DEPLOY FILES ==========
-    - name: Create deployment package
-      run: |
-        mkdir -p deploy/angular
-        mkdir -p deploy/api
-        
-        # Copy Angular build
-        cp -r home-backup/dist/browser/* deploy/angular/
-        
-        # Copy Node.js API
-        cp -r home-backup-api/* deploy/api/
-        
-        # Create deployment script
-        cat > deploy/deploy.sh << 'EOF'
-        #!/bin/bash
-        echo "Starting deployment..."
-        
-        # Create directories on server
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "mkdir -p /home/webapp/home-storage/angular"
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "mkdir -p /home/webapp/home-storage/api"
-        
-        # Copy Angular files
-        echo "Deploying Angular files..."
-        scp -i ~/.ssh/id_rsa -r deploy/angular/* ${{ secrets.SSH_USERNAME }}@192.168.1.107:/home/webapp/home-storage/angular/
-        
-        # Copy API files
-        echo "Deploying API files..."
-        scp -i ~/.ssh/id_rsa -r deploy/api/* ${{ secrets.SSH_USERNAME }}@192.168.1.107:/home/webapp/home-storage/api/
-        
-        # Install and restart API
-        echo "Installing API dependencies..."
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 << 'DEPLOY_SCRIPT'
-          cd /home/webapp/home-storage/api
-          npm install --only=production
-          
-          # Start/Restart the API with PM2
-          if command -v pm2 &> /dev/null; then
-            pm2 delete home-backup-api 2>/dev/null || true
-            pm2 start server.js --name "home-backup-api"
-            pm2 save
-          else
-            # If PM2 not installed, run directly
-            pkill -f "node.*server.js" 2>/dev/null || true
-            nohup node server.js > app.log 2>&1 &
-          fi
-        DEPLOY_SCRIPT
-        
-        echo "Deployment completed!"
-        EOF
-        
-        chmod +x deploy/deploy.sh
-        
-    - name: Deploy to Server
-      run: |
-        ./deploy/deploy.sh
-        
-    # ========== VERIFY DEPLOYMENT ==========
-    - name: Verify Deployment
-      run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@192.168.1.107 "ls -la /home/webapp/home-storage/"
-        echo "Deployment successful!"
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+        - name: copy file via ssh password
+          uses: appleboy/scp-action@v0.1.7
+          with:
+            host: 192.168.1.107
+            username: webapp
+            password: 1234
+            source: "/home/syed/Documents/test.txt"
+            target: "/home/webapp/"
