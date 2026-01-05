@@ -34,7 +34,9 @@ jobs:
     # ========== CREATE SSH KEY ==========
     - name: Setup SSH Key
       run: |
-        echo "1234" | sudo -S su -   
+        pwd
+        whoami
+        ssh webapp@192.168.1.107 
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
