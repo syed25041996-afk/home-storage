@@ -1,101 +1,31 @@
-name: Full-Stack CI/CD Pipeline
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
 
 on:
   push:
-    # Trigger on push to the 'main' branch
-    branches: [ main ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  # 1. CONTINUOUS INTEGRATION (CI) - Build & Test
   build:
-    name: Build Projects
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      - name: ⬇️ Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: ⚙️ Setup Node.js (Recommended for both Angular & Express)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' # Use a Node.js version compatible with your projects
-
-      # --- Frontend: Angular Build ----
-      - name: 📦 Install Frontend Dependencies
-        run: npm ci
-        working-directory: ./home-backup
-      
-      - name: 🛠️ Build Angular Project
-        # 'ng build' command must match your Angular project setup
-        run: npm run build -- --configuration=production
-        working-directory: ./home-backup
-
-      - name: 📤 Upload Frontend Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          # The path to the compiled Angular output directory
-          path: ./home-backup/dist/home-backup # Adjust 'dist/home-backup' if your Angular project name is different
-
-      # --- Backend: Express.js Dependencies (Optional Test/Lint steps can go here) ---
-      - name: 📦 Install Backend Dependencies
-        run: npm ci
-        working-directory: ./home-backup-api
-
-  # 2. CONTINUOUS DEPLOYMENT (CD) - Frontend Deployment
-  deploy-frontend:
-    name: Deploy Frontend
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Download Frontend Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: ./home-backup/dist/
-
-      - name: 🚀 Deploy Angular Static Files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./home-backup/dist/*"
-          # This must match the 'root' directory in your Nginx conf
-          target: "/home/webapp/home-storage/home-backup"
-          strip_components: 2 # Strips './home-backup/dist/' from the path
-
-  # 3. CONTINUOUS DEPLOYMENT (CD) - Backend Deployment
-  deploy-backend:
-    name: Deploy Backend & Restart
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout Repository (Needed for copying backend files)
-        uses: actions/checkout@v4
-        
-      - name: 🚀 Deploy Express.js Files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./home-backup-api/*" # Copy all files from the Express directory
-          # This must be the root of your Express application on the server
-          target: "/home/webapp/home-storage/home-backup-api"
-          exclude: "node_modules, .git" # Exclude heavy/unnecessary files
-
-      - name: 🔄 Restart Express.js Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            # 1. Navigate to the backend directory
-            cd /home/webapp/home-storage/home-backup-api
-            # 2. Re-install production dependencies (best practice after code deployment)
-            npm ci --only=production
-            # 3. Restart your process (e.g., using PM2, which is common for Node.js)
-            # Replace 'home-backup-api' with your PM2 process name
-            pm2 reload home-backup-api || pm2 start dist/server.js --name home-backup-api
-            echo "Deployment and restart complete."
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
