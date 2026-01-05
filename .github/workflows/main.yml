@@ -60,7 +60,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-          cd /var/www/home-storage
+          cd /home/webapp/home-storage/
           
           # Install API dependencies on server
           cd home-backup-api
