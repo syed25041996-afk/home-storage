@@ -48,7 +48,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         source: "home-backup/dist/,home-backup-api/"
-        target: "/var/www/home-storage/"
+        target: "/home/webapp/home-storage/"
         strip_components: 1
         overwrite: true
         
