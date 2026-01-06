@@ -22,7 +22,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}`,
+      url: `http://192.168.1.108:${PORT}`,
       description: 'Development server',
     },
   ],
