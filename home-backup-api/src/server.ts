@@ -52,12 +52,7 @@ const specs = swaggerJsdoc(options);
 // Configure CORS
 const corsOptions = {
   origin: [
-    'http://localhost:4200',  // Angular dev server
-    'http://localhost:80',    // Nginx
-    'http://192.168.1.108:4200',  // Your local network
-    'http://192.168.1.108:80',
-    'https://*.ngrok.io',     // All ngrok domains
-    'http://*.ngrok.io',
+    "*"
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
