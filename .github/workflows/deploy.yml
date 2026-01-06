@@ -63,4 +63,4 @@ jobs:
           -o IdentitiesOnly=yes \
           -o StrictHostKeyChecking=no \
           ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
-          "cd /home/home/apps/home-storage && ./deploy.sh"
+          "cd /home/home/apps/home-storage && sudo bash deploy.sh"
