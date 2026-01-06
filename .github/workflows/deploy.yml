@@ -12,13 +12,10 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 192.168.1.108
+          host: 0.tcp.in.ngrok.io
+          port: 13343
           username: home
-          key: ${{ secrets.HOME_SSH_KEY }} #update env
+          key: ${{ secrets.HOME_SSH_KEY }}
           script: |
             cd /home/home/apps/home-storage
-            echo "Successfully connected to home server"
-            ls -la
-            whoami
-            cat deploy.sh
-            bash deploy.sh
+            ./deploy.sh
