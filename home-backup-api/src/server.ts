@@ -49,8 +49,24 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 
-// Middleware
-app.use(cors({ origin: ['http://localhost:4200', 'http://192.168.1.108:4200'] }));
+// Configure CORS
+const corsOptions = {
+  origin: [
+    'http://localhost:4200',  // Angular dev server
+    'http://localhost:80',    // Nginx
+    'http://192.168.1.108:4200',  // Your local network
+    'http://192.168.1.108:80',
+    'https://*.ngrok.io',     // All ngrok domains
+    'http://*.ngrok.io',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
