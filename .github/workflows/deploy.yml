@@ -9,11 +9,6 @@ jobs:
 
     - name: 🚀 Direct SSH Deployment
       run: |
-        # Setup SSH
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-
         # Execute deployment
         ssh -p ${{ secrets.NGROK_PORT }} \
           -i ~/.ssh/id_rsa \
