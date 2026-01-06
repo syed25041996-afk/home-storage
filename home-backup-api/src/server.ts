@@ -50,7 +50,7 @@ const options = {
 const specs = swaggerJsdoc(options);
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:4200' }));
+app.use(cors({ origin: ['http://localhost:4200', 'http://192.168.1.108:4200'] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
