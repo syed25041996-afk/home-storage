@@ -1,58 +1,66 @@
-name: 🚀 Deploy via ngrok
-on:
-  push:
-    branches: [ main, master ]
-  workflow_dispatch:
+name: 🚀 Deploy
+on: [push]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: 📦 Checkout code
-      uses: actions/checkout@v3
-      
+    - uses: actions/checkout@v3
+    
     - name: 🔐 Setup SSH Key
       run: |
-        # Create SSH directory
+        # Clean setup
+        rm -rf ~/.ssh
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
         
-        # Write private key from secrets
+        # Write private key exactly as in secrets
+        # NO modifications, NO sed commands
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        # Write public key (optional, for debugging)
-        echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub 2>/dev/null || true
+        # Test the key file
+        echo "=== Key Validation ==="
+        ls -la ~/.ssh/id_rsa
+        ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null && echo "✅ Key is valid" || echo "❌ Key is invalid"
         
-        # Add server to known_hosts
+        # Add to known_hosts
         ssh-keyscan -p ${{ secrets.NGROK_PORT }} ${{ secrets.NGROK_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
         
-        # Debug: Show key info
-        echo "=== SSH Key Info ==="
-        ls -la ~/.ssh/
-        echo "Key type:"
-        ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null || echo "Cannot read key"
-        
-    - name: 🔧 Test SSH Connection
+    - name: 🔧 Debug Connection
       run: |
-        echo "Testing SSH connection..."
-        ssh -v -p ${{ secrets.NGROK_PORT }} \
+        echo "=== Testing Connection ==="
+        echo "Host: ${{ secrets.NGROK_HOST }}"
+        echo "Port: ${{ secrets.NGROK_PORT }}"
+        
+        # Simple test
+        timeout 10 ssh -p ${{ secrets.NGROK_PORT }} \
           -i ~/.ssh/id_rsa \
           -o IdentitiesOnly=yes \
           -o BatchMode=yes \
+          -o ConnectTimeout=5 \
           -o StrictHostKeyChecking=no \
           ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
-          "echo '✅ Test successful from GitHub Actions'" 2>&1 | grep -i "auth\|success\|failed\|denied" || true
-          
-    - name: 🚀 Deploy with SSH Action
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.NGROK_HOST }}
-        port: ${{ secrets.NGROK_PORT }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          echo "Starting deployment..."
-          cd /home/home/apps/home-storage
-          chmod +x deploy.sh
-          ./deploy.sh
+          "echo 'Hello from GitHub Actions'" 2>&1
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Connection successful!"
+        else
+          echo "❌ Connection failed"
+          echo "=== Debug Info ==="
+          # Show key fingerprint
+          ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null || echo "Cannot read key"
+        fi
+        
+    - name: 🚀 Deploy Application
+      if: success()
+      run: |
+        echo "Starting deployment..."
+        
+        # Simple direct command
+        ssh -p ${{ secrets.NGROK_PORT }} \
+          -i ~/.ssh/id_rsa \
+          -o IdentitiesOnly=yes \
+          -o StrictHostKeyChecking=no \
+          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
+          "cd /home/home/apps/home-storage && ./deploy.sh"
