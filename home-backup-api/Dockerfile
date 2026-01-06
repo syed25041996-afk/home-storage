@@ -16,4 +16,4 @@ WORKDIR /app/dist
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "server.js","--host", "0.0.0.0", "--port", "3000"]
