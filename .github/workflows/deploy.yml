@@ -17,4 +17,8 @@ jobs:
           key: ${{ secrets.HOME_SSH_KEY }} #update env
           script: |
             cd /home/home/apps/home-storage
+            echo "Successfully connected to home server"
+            ls -la
+            whoami
+            cat deploy.sh
             bash deploy.sh
