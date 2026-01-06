@@ -7,6 +7,7 @@ COPY package*.json ./
 
 # Install production dependencies only
 RUN npm ci --only=production
+RUN npm build
 
 # Copy dist folder with server.js
 COPY dist/ ./dist/
@@ -15,7 +16,5 @@ COPY dist/ ./dist/
 WORKDIR /app/dist
 
 EXPOSE 3000
-
-RUN npm run build
 
 CMD ["node", "server.js"]
