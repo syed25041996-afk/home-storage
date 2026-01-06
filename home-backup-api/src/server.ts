@@ -48,9 +48,20 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
+// ✅ FIX: Allow both localhost AND your IP
+const corsOptions = {
+  origin: [
+    'http://localhost:4200',          // Localhost
+    'http://192.168.1.108:4200',      // Your local IP - THIS WAS MISSING!
+    'http://localhost:80',            // Nginx localhost
+    'http://192.168.1.108:80',        // Nginx IP
+    /\.ngrok\.io$/                    // All ngrok domains
+  ],
+  credentials: true,                  // ✅ IMPORTANT for cookies/sessions
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
 
-// Configure CORS for all origins
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -72,5 +83,5 @@ app.use(errorHandler);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`API documentation available at http://localhost:${PORT}/api-docs`);
+  console.log(`API documentation available at http://192.168.1.108:${PORT}/api-docs`);
 });
