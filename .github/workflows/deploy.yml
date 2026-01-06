@@ -1,27 +1,21 @@
-name: Simple Deploy
-on: [push]
+name: Deploy to Home Server
+
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Deploy via SSH
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        NGROK_HOST: ${{ secrets.NGROK_HOST }}
-        NGROK_PORT: ${{ secrets.NGROK_PORT }}
-        SSH_USER: ${{ secrets.SSH_USERNAME }}
-      run: |
-        # Setup SSH
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        
-        # Direct SSH command
-        ssh -p $NGROK_PORT \
-          -o StrictHostKeyChecking=no \
-          -o ConnectTimeout=30 \
-          $SSH_USER@$NGROK_HOST \
-          "cd /home/home/apps/home-storage && git pull && chmod +x deploy.sh && ./deploy.sh"
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 0.tcp.in.ngrok.io
+          port: 18224
+          username: home
+          key: ${{ secrets.HOME_SSH_KEY }}
+          script: |
+            cd /home/home/apps/home-storage
+            ./deploy.sh
