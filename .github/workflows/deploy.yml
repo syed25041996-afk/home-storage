@@ -17,4 +17,4 @@ jobs:
           key: ${{ secrets.HOME_SSH_KEY }} #update env
           script: |
             cd /home/home/apps/home-storage
-            ./deploy.sh
+            bash deploy.sh
