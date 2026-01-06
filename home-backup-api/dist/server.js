@@ -24,7 +24,7 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: `http://localhost:${PORT}`,
+            url: `http://192.168.1.108:${PORT}`,
             description: 'Development server',
         },
     ],
@@ -48,8 +48,19 @@ const options = {
     apis: ['./src/routes/*.ts'],
 };
 const specs = (0, swagger_jsdoc_1.default)(options);
-// Middleware
-app.use((0, cors_1.default)({ origin: 'http://localhost:4200' }));
+// ✅ FIX: Allow both localhost AND your IP
+const corsOptions = {
+    origin: [
+        'http://localhost:4200', // Localhost
+        'http://192.168.1.108:4200', // Your local IP - THIS WAS MISSING!
+        'http://localhost:80', // Nginx localhost
+        'http://192.168.1.108:80', // Nginx IP
+        /\.ngrok\.io$/ // All ngrok domains
+    ],
+    credentials: true, // ✅ IMPORTANT for cookies/sessions
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Swagger UI
@@ -66,6 +77,6 @@ app.use(middleware_1.errorHandler);
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`API documentation available at http://localhost:${PORT}/api-docs`);
+    console.log(`API documentation available at http://192.168.1.108:${PORT}/api-docs`);
 });
 //# sourceMappingURL=server.js.map
