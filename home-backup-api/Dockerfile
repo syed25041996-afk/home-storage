@@ -5,14 +5,19 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
-RUN npm build
+# Install ALL dependencies
+RUN npm ci
 
-# Copy dist folder with server.js
-COPY dist/ ./dist/
+# Copy source code
+COPY . .
 
-# Set working directory to dist if that's where server.js is
+# Build the application
+RUN npm run build
+
+# Clean up dev dependencies (optional)
+RUN npm prune --production
+
+# Set working directory to dist
 WORKDIR /app/dist
 
 EXPOSE 3000
