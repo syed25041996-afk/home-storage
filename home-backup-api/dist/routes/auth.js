@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const models_1 = require("../models");
 const router = (0, express_1.Router)();
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 /**
  * @swagger
  * /api/auth/register:
@@ -88,8 +87,7 @@ router.post('/login', async (req, res) => {
         if (!user || !(await bcryptjs_1.default.compare(password, user.password))) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const token = jsonwebtoken_1.default.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
+        res.json({ user: { id: user.id, username: user.username, role: user.role } });
     }
     catch (error) {
         console.error('Login error:', error);

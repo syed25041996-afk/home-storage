@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const fs_1 = __importDefault(require("fs"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
-const models_1 = require("../models");
 const middleware_1 = require("../middleware");
+const models_1 = require("../models");
 const router = (0, express_1.Router)();
 // Ensure uploads directory exists
 const uploadsDir = path_1.default.join(__dirname, '../../uploads');
@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
 };
 const upload = (0, multer_1.default)({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    // limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: fileFilter
 });
 /**
@@ -67,7 +67,7 @@ const upload = (0, multer_1.default)({
  *       401:
  *         description: Unauthorized
  */
-router.post('/upload-files', middleware_1.authenticateJWT, upload.array('files'), async (req, res) => {
+router.post('/upload-files', middleware_1.authenticateBasic, upload.array('files'), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'No files uploaded' });
