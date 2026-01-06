@@ -1,24 +1,58 @@
-name: Deploy
-on: [push]
+name: 🚀 Deploy via ngrok
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-
-    - name: 🚀 Direct SSH Deployment
+    - name: 📦 Checkout code
+      uses: actions/checkout@v3
+      
+    - name: 🔐 Setup SSH Key
       run: |
-        # Execute deployment
-        ssh -p ${{ secrets.NGROK_PORT }} \
+        # Create SSH directory
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        
+        # Write private key from secrets
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Write public key (optional, for debugging)
+        echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub 2>/dev/null || true
+        
+        # Add server to known_hosts
+        ssh-keyscan -p ${{ secrets.NGROK_PORT }} ${{ secrets.NGROK_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+        
+        # Debug: Show key info
+        echo "=== SSH Key Info ==="
+        ls -la ~/.ssh/
+        echo "Key type:"
+        ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null || echo "Cannot read key"
+        
+    - name: 🔧 Test SSH Connection
+      run: |
+        echo "Testing SSH connection..."
+        ssh -v -p ${{ secrets.NGROK_PORT }} \
           -i ~/.ssh/id_rsa \
           -o IdentitiesOnly=yes \
+          -o BatchMode=yes \
           -o StrictHostKeyChecking=no \
-          -o ConnectTimeout=30 \
-          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} << 'DEPLOY_EOF'
-        set -e
-        echo "🚀 Deployment started"
-        cd /home/home/apps/home-storage
-        ./deploy.sh
-        echo "✅ Deployment completed"
-        DEPLOY_EOF
+          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
+          "echo '✅ Test successful from GitHub Actions'" 2>&1 | grep -i "auth\|success\|failed\|denied" || true
+          
+    - name: 🚀 Deploy with SSH Action
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.NGROK_HOST }}
+        port: ${{ secrets.NGROK_PORT }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          echo "Starting deployment..."
+          cd /home/home/apps/home-storage
+          chmod +x deploy.sh
+          ./deploy.sh
