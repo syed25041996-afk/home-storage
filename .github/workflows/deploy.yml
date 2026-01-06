@@ -9,13 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: 0.tcp.in.ngrok.io
-          port: 18224
-          username: home
-          key: ${{ secrets.HOME_SSH_KEY }}
-          script: |
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOME_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p 18224 0.tcp.in.ngrok.io >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: |
+          ssh -p 18224 \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=10 \
+              home@0.tcp.in.ngrok.io << 'EOF'
             cd /home/home/apps/home-storage
             ./deploy.sh
+          EOF
