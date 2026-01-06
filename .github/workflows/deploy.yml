@@ -6,14 +6,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Deploy via SSH
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.NGROK_HOST }}
-        port: ${{ secrets.NGROK_PORT }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.HOME_SSH_KEY }}
-        script: |
-          cd /home/home/apps/home-storage
-          ./deploy.sh
+
+    - name: 🚀 Direct SSH Deployment
+      run: |
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        # Execute deployment
+        ssh -p ${{ secrets.NGROK_PORT }} \
+          -i ~/.ssh/id_rsa \
+          -o IdentitiesOnly=yes \
+          -o StrictHostKeyChecking=no \
+          -o ConnectTimeout=30 \
+          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} << 'DEPLOY_EOF'
+        set -e
+        echo "🚀 Deployment started"
+        cd /home/home/apps/home-storage
+        ./deploy.sh
+        echo "✅ Deployment completed"
+        DEPLOY_EOF
