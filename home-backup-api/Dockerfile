@@ -14,9 +14,6 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Clean up dev dependencies (optional)
-RUN npm prune --production
-
 # Set working directory to dist
 WORKDIR /app/dist
 
