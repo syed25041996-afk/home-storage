@@ -2,21 +2,23 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (for better caching)
 COPY package*.json ./
 
-# Install ALL dependencies
-RUN npm ci
+# Install dependencies
+RUN npm install
 
 # Copy source code
 COPY . .
 
-# Build the application
+# Copy .env file explicitly
+COPY .env .env
+
+# Build if using TypeScript
 RUN npm run build
 
-# Set working directory to dist
-WORKDIR /app/dist
-
+# Expose port
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# Start command
+CMD ["npm", "start"]
