@@ -38,6 +38,11 @@ class FileModel {
         const result = await db_1.default.query(query, [userId]);
         return result.rows;
     }
+    static async countByUserId(userId) {
+        const query = 'SELECT COUNT(*) FROM files WHERE uploaded_by = $1';
+        const result = await db_1.default.query(query, [userId]);
+        return parseInt(result.rows[0].count, 10);
+    }
 }
 exports.FileModel = FileModel;
 //# sourceMappingURL=models.js.map

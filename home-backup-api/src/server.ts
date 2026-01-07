@@ -22,7 +22,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://192.168.1.108:${PORT}`,
+      url: `http://localhost:${PORT}`,
       description: 'Development server',
     },
   ],
@@ -83,5 +83,5 @@ app.use(errorHandler);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`API documentation available at http://192.168.1.108:${PORT}/api-docs`);
+  console.log(`API documentation available at http://localhost:${PORT}/api-docs`);
 });

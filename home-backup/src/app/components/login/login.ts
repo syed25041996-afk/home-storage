@@ -1,22 +1,24 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../environments/environment';
+import { environment } from '../../../environments/environment';
+import { ErrorModalService } from '../../shared/error-modal.service';
+import { SuccessModalService } from '../../shared/success-modal.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './login.html',
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
   username = signal('');
   password = signal('');
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private errorModalService: ErrorModalService, private successModalService: SuccessModalService) {}
 
   onSubmit() {
     if (this.username() && this.password()) {
@@ -28,11 +30,14 @@ export class LoginComponent {
           // Store user info and credentials for Basic auth
           localStorage.setItem('currentUser', JSON.stringify(response.user));
           localStorage.setItem('credentials', btoa(`${this.username()}:${this.password()}`));
-          this.router.navigate(['/dashboard']);
+          this.successModalService.showSuccess('Login Successful', 'Welcome back!');
+          // Navigate after showing success
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1500);
         },
         error: (error) => {
-          console.error('Login failed:', error);
-          // In real app, show error message to user
+          this.errorModalService.showError('Login Failed', 'Invalid username or password. Please try again.');
         }
       });
     }

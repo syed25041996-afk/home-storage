@@ -1,10 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ErrorModalService } from './shared/error-modal.service';
+import { SuccessModalService } from './shared/success-modal.service';
+import { ErrorModalComponent } from './components/error-modal/error-modal';
+import { SuccessModalComponent } from './components/success-modal/success-modal';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `<router-outlet></router-outlet>`,
+  imports: [RouterOutlet, ErrorModalComponent, SuccessModalComponent],
+  templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App {
+  errorModalService = inject(ErrorModalService);
+  successModalService = inject(SuccessModalService);
+}
