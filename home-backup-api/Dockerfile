@@ -11,7 +11,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Expose server port
+# Build the application
+RUN npm run build
+
+# Set working directory to dist
+WORKDIR /app/dist
+
 EXPOSE 3000
 
 CMD ["node", "server.js"]
