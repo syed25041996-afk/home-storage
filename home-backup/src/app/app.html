@@ -1,5 +1,9 @@
 <router-outlet></router-outlet>
 
+@if(loadingService.isLoading()){
+<app-loader></app-loader>
+}
+
 @if(errorModalService.show()){
 <app-error-modal
   [title]="errorModalService.title()"

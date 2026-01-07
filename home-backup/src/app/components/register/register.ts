@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ErrorModalService } from '../../shared/error-modal.service';
 import { SuccessModalService } from '../../shared/success-modal.service';
+import { LoadingService } from '../../shared/loading.service';
 
 @Component({
   selector: 'app-register',
@@ -19,10 +20,11 @@ export class RegisterComponent {
   password = signal('');
   confirmPassword = signal('');
 
-  constructor(private router: Router, private http: HttpClient, private errorModalService: ErrorModalService, private successModalService: SuccessModalService) {}
+  constructor(private router: Router, private http: HttpClient, private errorModalService: ErrorModalService, private successModalService: SuccessModalService, private loadingService: LoadingService) {}
 
   onSubmit() {
     if (this.username() && this.password() && this.password() === this.confirmPassword()) {
+      this.loadingService.start();
       this.http.post(`${environment.apiUrl}/auth/register`, {
         username: this.username(),
         password: this.password()
@@ -36,6 +38,9 @@ export class RegisterComponent {
         },
         error: (error) => {
           this.errorModalService.showError('Registration Failed', 'Unable to create account. Please try again.');
+        },
+        complete: () => {
+          this.loadingService.stop();
         }
       });
     }

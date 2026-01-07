@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ErrorModalService } from '../../shared/error-modal.service';
 import { SuccessModalService } from '../../shared/success-modal.service';
+import { LoadingService } from '../../shared/loading.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -18,14 +20,19 @@ export class LoginComponent {
   username = signal('');
   password = signal('');
 
-  constructor(private router: Router, private http: HttpClient, private errorModalService: ErrorModalService, private successModalService: SuccessModalService) {}
+  constructor(private router: Router, private http: HttpClient, private errorModalService: ErrorModalService, private successModalService: SuccessModalService, private loadingService: LoadingService) {}
 
   onSubmit() {
     if (this.username() && this.password()) {
+      this.loadingService.start();
       this.http.post(`${environment.apiUrl}/auth/login`, {
         username: this.username(),
         password: this.password()
-      }).subscribe({
+      }).pipe(
+        finalize(() => {
+          this.loadingService.stop();
+        })
+      ).subscribe({
         next: (response: any) => {
           // Store user info and credentials for Basic auth
           localStorage.setItem('currentUser', JSON.stringify(response.user));
@@ -38,6 +45,9 @@ export class LoginComponent {
         },
         error: (error) => {
           this.errorModalService.showError('Login Failed', 'Invalid username or password. Please try again.');
+        },
+        complete: () => {
+          this.loadingService.stop();
         }
       });
     }

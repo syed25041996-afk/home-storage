@@ -7,6 +7,7 @@ import { AppEvents } from '../../shared/app-events';
 import { HeaderComponent } from '../header/header';
 import { ErrorModalService } from '../../shared/error-modal.service';
 import { SuccessModalService } from '../../shared/success-modal.service';
+import { LoadingService } from '../../shared/loading.service';
 import { finalize } from 'rxjs';
 
 interface FileItem {
@@ -45,7 +46,7 @@ export class DashboardComponent {
   isDragOver: WritableSignal<boolean> = signal(false);
   isUploading: WritableSignal<boolean> = signal(false);
 
-  constructor(private router: Router, private uploadService: Upload, private appEvents: AppEvents, private errorModalService: ErrorModalService, private successModalService: SuccessModalService) { }
+  constructor(private router: Router, private uploadService: Upload, private appEvents: AppEvents, private errorModalService: ErrorModalService, private successModalService: SuccessModalService, private loadingService: LoadingService) { }
 
   ngOnInit() {
 
@@ -71,30 +72,39 @@ export class DashboardComponent {
 
   // Call getfiles count from UploadService to update totalFiles
   getFilesCount() {
+    this.loadingService.start();
     this.uploadService.getFilesCount().subscribe({
       next: (res: any) => {
         this.totalFiles.set(res.count);
       },
       error: (err) => {
         this.errorModalService.showError('Error', 'Failed to fetch files count. Please try again.');
+      },
+      complete: () => {
+        this.loadingService.stop();
       }
     });
   }
 
   // Call getRecentUploads from UploadService to update recentUploads
   getRecentUploads() {
+    this.loadingService.start();
     this.uploadService.getRecentUploads().subscribe({
       next: (res: any) => {
         this.recentUploads.set(res.files);
       },
       error: (err) => {
         this.errorModalService.showError('Error', 'Failed to fetch recent uploads. Please try again.');
+      },
+      complete: () => {
+        this.loadingService.stop();
       }
     });
   }
 
   // Call getStorageUsed from UploadService to update storageUsed
   getStorageUsed() {
+    this.loadingService.start();
     this.uploadService.getStorageUsed().subscribe({
       next: (res: any) => {
         this.storageUsed.set(res.storageUsed);
@@ -102,6 +112,9 @@ export class DashboardComponent {
       },
       error: (err) => {
         this.errorModalService.showError('Error', 'Failed to fetch storage information. Please try again.');
+      },
+      complete: () => {
+        this.loadingService.stop();
       }
     });
   }
@@ -165,12 +178,14 @@ export class DashboardComponent {
     this.isUploading.set(true);
     this.uploadProgress.set(0);
     this.uploadStatus.set('');
+    this.loadingService.start();
 
     this.uploadService.uploadFiles(files).pipe(
       finalize(() => {
         this.isUploading.set(false);
         this.uploadStatus.set('');
         this.selectedFiles.set([]);
+        this.loadingService.stop();
       })
     ).subscribe({
       next: (event: HttpEvent<any>) => {
