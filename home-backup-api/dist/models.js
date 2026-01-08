@@ -38,6 +38,15 @@ class FileModel {
         const result = await db_1.default.query(query, [userId]);
         return result.rows;
     }
+    static async findById(id) {
+        const query = 'SELECT * FROM files WHERE id = $1';
+        const result = await db_1.default.query(query, [id]);
+        return result.rows[0] || null;
+    }
+    static async deleteById(id) {
+        const query = 'DELETE FROM files WHERE id = $1';
+        await db_1.default.query(query, [id]);
+    }
     static async countByUserId(userId) {
         const query = 'SELECT COUNT(*) FROM files WHERE uploaded_by = $1';
         const result = await db_1.default.query(query, [userId]);

@@ -7,6 +7,8 @@ export declare class UserModel {
 export declare class FileModel {
     static create(filename: string, originalName: string, path: string, size: number, mimetype: string, uploadedBy: number): Promise<FileMetadata>;
     static findByUserId(userId: number): Promise<FileMetadata[]>;
+    static findById(id: number): Promise<FileMetadata | null>;
+    static deleteById(id: number): Promise<void>;
     static countByUserId(userId: number): Promise<number>;
 }
 //# sourceMappingURL=models.d.ts.map

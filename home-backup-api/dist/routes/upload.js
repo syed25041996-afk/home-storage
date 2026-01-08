@@ -215,6 +215,41 @@ router.post('/upload-files', middleware_1.authenticateBasic, (0, multer_1.defaul
         });
     }
 });
+//Delete a file for the authenticated user
+router.delete('/upload-files/:id', middleware_1.authenticateBasic, async (req, res) => {
+    try {
+        const fileId = parseInt(req.params.id, 10);
+        const userId = req.user.id;
+        const file = await models_1.FileModel.findById(fileId);
+        if (!file || file.uploaded_by !== userId) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+        // Delete from filesystem
+        const filePath = path_1.default.join(uploadsDir, file.filename);
+        if (fs_1.default.existsSync(filePath)) {
+            fs_1.default.unlinkSync(filePath);
+        }
+        // Delete from database
+        await models_1.FileModel.deleteById(fileId);
+        res.status(200).json({ message: 'File deleted successfully' });
+    }
+    catch (error) {
+        console.error('Delete error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+// Fetch uploaded files for the authenticated user
+router.get('/upload-files', middleware_1.authenticateBasic, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const files = await models_1.FileModel.findByUserId(userId);
+        res.status(200).json({ files });
+    }
+    catch (error) {
+        console.error('Fetch files error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 // Get number of uploaded files for the authenticated user
 router.get('/upload-files/count', middleware_1.authenticateBasic, async (req, res) => {
     try {
@@ -261,6 +296,50 @@ router.get('/upload-files/storage', middleware_1.authenticateBasic, async (req, 
     }
     catch (error) {
         console.error('Fetch storage used error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+// Fetch the file url from the authenticated user by file ID
+router.get('/upload-files/:id/download', middleware_1.authenticateBasic, async (req, res) => {
+    try {
+        const fileId = parseInt(req.params.id, 10);
+        const userId = req.user.id;
+        const file = await models_1.FileModel.findById(fileId);
+        if (!file || file.uploaded_by !== userId) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+        const filePath = path_1.default.join(uploadsDir, file.filename);
+        if (!fs_1.default.existsSync(filePath)) {
+            return res.status(404).json({ message: 'File not found on server' });
+        }
+        // Send the file in response
+        res.download(filePath, file.original_name);
+    }
+    catch (error) {
+        console.error('Download error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+// Delete a file by ID
+router.delete('/upload-files/:id', middleware_1.authenticateBasic, async (req, res) => {
+    try {
+        const fileId = parseInt(req.params.id, 10);
+        const userId = req.user.id;
+        const file = await models_1.FileModel.findById(fileId);
+        if (!file || file.uploaded_by !== userId) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+        // Delete from filesystem
+        const filePath = path_1.default.join(uploadsDir, file.filename);
+        if (fs_1.default.existsSync(filePath)) {
+            fs_1.default.unlinkSync(filePath);
+        }
+        // Delete from database
+        await models_1.FileModel.deleteById(fileId);
+        res.status(200).json({ message: 'File deleted successfully' });
+    }
+    catch (error) {
+        console.error('Delete error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

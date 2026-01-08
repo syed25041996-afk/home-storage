@@ -339,7 +339,7 @@ router.get('/upload-files/storage', authenticateBasic, async (req: AuthRequest, 
   }
 });
 
-// Download a file by ID
+// Fetch the file url from the authenticated user by file ID
 router.get('/upload-files/:id/download', authenticateBasic, async (req: AuthRequest, res: Response) => {
   try {
     const fileId = parseInt(req.params.id, 10);
@@ -352,9 +352,10 @@ router.get('/upload-files/:id/download', authenticateBasic, async (req: AuthRequ
 
     const filePath = path.join(uploadsDir, file.filename);
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'File not found on disk' });
+      return res.status(404).json({ message: 'File not found on server' });
     }
 
+    // Send the file in response
     res.download(filePath, file.original_name);
   } catch (error) {
     console.error('Download error:', error);
