@@ -11,6 +11,7 @@ import { LoadingService } from '../../shared/loading.service';
 import { finalize } from 'rxjs';
 
 interface FileItem {
+  id: number;
   original_name: string;
   size: number;
   uploaded_at: string;
@@ -218,5 +219,53 @@ export class DashboardComponent {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  viewFile(file: FileItem): void {
+    this.loadingService.start();
+    this.uploadService.downloadFile(file.id).pipe(
+      finalize(() => {
+        this.loadingService.stop();
+      })
+    ).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.original_name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.errorModalService.showError('Download Failed', 'Unable to download the file. Please try again.');
+      },
+      complete: () => {
+        this.loadingService.stop();
+      }
+    });
+  }
+
+  deleteFile(file: FileItem): void {
+    if (confirm(`Are you sure you want to delete "${file.original_name}"?`)) {
+      this.loadingService.start();
+      this.uploadService.deleteFile(file.id).pipe(
+        finalize(() => {
+          this.loadingService.stop();
+        })
+      ).subscribe({
+        next: () => {
+          this.successModalService.showSuccess('File Deleted', 'The file has been deleted successfully.');
+          this.appEvents.notifyDashboardRefresh();
+        },
+        error: (err) => {
+          this.errorModalService.showError('Delete Failed', 'Unable to delete the file. Please try again.');
+        },
+        complete: () => {
+          this.loadingService.stop();
+        }
+      });
+    }
   }
 }

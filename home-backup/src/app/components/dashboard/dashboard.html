@@ -1,135 +1,148 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen fb-bg">
   <app-header [currentUser]="currentUser()" (logout)="logout()"></app-header>
 
-  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="px-4 py-6 sm:px-0">
+  <div class="flex pt-4">
+    <!-- Main Feed -->
+    <main class="flex-1 max-w-2xl mx-auto p-4">
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Files</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ totalFiles() }}</dd>
-                </dl>
-              </div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div class="fb-card p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Files</dt>
+                <dd class="text-lg font-medium text-gray-900">{{ totalFiles() }}</dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Storage used by you</dt>
-                  <dd class="text-lg font-medium text-gray-900">
-                    {{ (storageUsed() / (1024 * 1024)).toFixed(2) }} MB
-                  </dd>
-                </dl>
-              </div>
+        <div class="fb-card p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Storage used by you</dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {{ (storageUsed() / (1024 * 1024)).toFixed(2) }} MB
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Remaining Storage</dt>
-                  <dd class="text-lg font-medium text-gray-900">
-                    {{ (remainingStorage() / (1024 * 1024 * 1024)).toFixed(2) }} GB
-                  </dd>
-                </dl>
-              </div>
+        <div class="fb-card p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Remaining Storage</dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {{ (remainingStorage() / (1024 * 1024 * 1024)).toFixed(2) }} GB
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg
-                  class="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Recent Uploads</dt>
-                  <dd class="text-lg font-medium text-gray-900">{{ recentUploads().length }}</dd>
-                </dl>
-              </div>
+        <div class="fb-card p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Recent Uploads</dt>
+                <dd class="text-lg font-medium text-gray-900">{{ recentUploads().length }}</dd>
+              </dl>
             </div>
           </div>
         </div>
       </div>
 
       <!-- File Upload Section -->
-      <div class="bg-white shadow rounded-lg p-6 mb-8">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Upload New Files</h2>
+      <div class="fb-card p-4 mb-6">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0 h-10 w-10">
+            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+              <svg
+                class="h-6 w-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3 flex-1">
+            <p class="text-sm text-gray-600">Upload new files</p>
+          </div>
+        </div>
 
         <!-- Drag and Drop Zone -->
         <div
-          class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-200 hover:border-blue-400"
-          [class.border-blue-500]="isDragOver()"
+          class="border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all duration-200 hover:bg-gray-50"
           [class.bg-blue-50]="isDragOver()"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
@@ -138,7 +151,7 @@
         >
           <div class="text-gray-600">
             <svg
-              class="mx-auto h-12 w-12 text-gray-400"
+              class="mx-auto h-8 w-8 text-gray-400"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -166,22 +179,16 @@
 
         <!-- Selected Files List -->
         @if (selectedFiles().length > 0) {
-        <div class="mt-6">
-          <h3 class="text-lg font-semibold mb-2 text-gray-700">Selected Files</h3>
+        <div class="mt-4">
           <ul class="space-y-2">
             @for (file of selectedFiles(); track file; let i = $index) {
-            <li
-              class="flex items-center justify-between bg-gray-50 p-3 rounded-md"
-            >
+            <li class="flex items-center justify-between bg-gray-100 p-2 rounded">
               <div class="flex-1">
                 <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
                 <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
               </div>
-              <button
-                (click)="removeFile(i)"
-                class="ml-2 text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-100 transition-colors"
-              >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button (click)="removeFile(i)" class="text-red-600 hover:text-red-800 p-1">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -193,17 +200,7 @@
             </li>
             }
           </ul>
-        </div>
-        }
-
-        <!-- Upload Button -->
-        @if (selectedFiles().length > 0) {
-        <div class="mt-6">
-          <button
-            (click)="uploadFiles()"
-            [disabled]="isUploading()"
-            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
+          <button (click)="uploadFiles()" [disabled]="isUploading()" class="mt-4 fb-button w-full">
             {{ isUploading() ? 'Uploading...' : 'Upload Files' }}
           </button>
         </div>
@@ -212,103 +209,83 @@
         <!-- Progress Bar -->
         @if(isUploading()){
         <div class="mt-4">
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="w-full bg-gray-200 rounded-full h-2">
             <div
-              class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              class="bg-blue-600 h-2 rounded-full transition-all duration-300"
               [style.width.%]="uploadProgress()"
             ></div>
           </div>
-          <p class="text-sm text-gray-600 mt-1">{{ uploadProgress() }}% uploaded</p>
+          <p class="text-xs text-gray-600 mt-1">{{ uploadProgress() }}% uploaded</p>
         </div>
         }
 
         <!-- Status Messages -->
         @if (uploadStatus()){
-        <div class="mt-4">
-          <div
-            class="p-4 rounded-md"
-            [ngClass]="{
-              'bg-green-100 text-green-800': uploadStatus() === 'success',
-              'bg-red-100 text-red-800': uploadStatus() === 'error'
-            }"
-          >
-            <p>
-              {{
-                uploadStatus() === 'success'
-                  ? 'Files uploaded successfully!'
-                  : 'Upload failed. Please try again.'
-              }}
-            </p>
-          </div>
+        <div
+          class="mt-4 p-3 rounded"
+          [ngClass]="{
+            'bg-green-100 text-green-800': uploadStatus() === 'success',
+            'bg-red-100 text-red-800': uploadStatus() === 'error'
+          }"
+        >
+          <p class="text-sm">
+            {{
+              uploadStatus() === 'success'
+                ? 'Files uploaded successfully!'
+                : 'Upload failed. Please try again.'
+            }}
+          </p>
         </div>
         }
       </div>
 
       <!-- Recent Files -->
-      <div class="bg-white shadow overflow-hidden sm:rounded-md">
-        <div class="px-4 py-5 sm:px-6">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Files</h3>
-          <p class="mt-1 max-w-2xl text-sm text-gray-500">Your recently uploaded files</p>
-        </div>
-        <ul role="list" class="divide-y divide-gray-200">
-          @for (file of recentUploads(); track file) {
-          <li class="px-4 py-4 sm:px-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10">
-                  <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                    <svg
-                      class="h-6 w-6 text-gray-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ file.original_name }}</div>
-                  <div class="text-sm text-gray-500">
-                    {{ (file.size / (1024 * 1024)).toFixed(2) }} MB •
-                    {{ file.uploaded_at | date : 'dd-MMM-yyyy' }}
-                  </div>
-                </div>
+      <div class="space-y-4">
+        @for (file of recentUploads(); track file) {
+        <div class="fb-card p-4">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                <svg
+                  class="h-6 w-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
               </div>
-              <div class="text-sm text-gray-500">{{ file.type }}</div>
             </div>
-          </li>
-          }
-        </ul>
+            <div class="ml-3 flex-1">
+              <div class="text-sm font-medium text-gray-900">{{ file.original_name }}</div>
+              <div class="text-xs text-gray-500 mt-1">
+                {{ (file.size / (1024 * 1024)).toFixed(2) }} MB • Uploaded
+                {{ file.uploaded_at | date : 'dd-MMM-yyyy' }}
+              </div>
+              <div class="mt-2 flex space-x-2">
+                <button
+                  (click)="viewFile(file)"
+                  class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 border border-blue-600 rounded hover:bg-blue-50"
+                >
+                  View
+                </button>
+                <button
+                  (click)="deleteFile(file)"
+                  class="text-red-600 hover:text-red-800 text-xs px-2 py-1 border border-red-600 rounded hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
       </div>
-
-      <!-- Family Members -->
-      <!-- <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-md">
-            <div class="px-4 py-5 sm:px-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">Family Members</h3>
-              <p class="mt-1 max-w-2xl text-sm text-gray-500">People who can access the storage</p>
-            </div>
-            <ul role="list" class="divide-y divide-gray-200">
-              <li *ngFor="let member of familyMembers()" class="px-4 py-4 sm:px-6">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
-                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                      <span class="text-sm font-medium text-white">{{ member.name.charAt(0) }}</span>
-                    </div>
-                  </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                    <div class="text-sm text-gray-500">{{ member.role }}</div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div> -->
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
