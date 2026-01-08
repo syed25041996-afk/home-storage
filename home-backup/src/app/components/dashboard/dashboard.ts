@@ -221,28 +221,15 @@ export class DashboardComponent {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  viewFile(file: FileItem): void {
-    this.loadingService.start();
-    this.uploadService.downloadFile(file.id).pipe(
-      finalize(() => {
-        this.loadingService.stop();
-      })
-    ).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = file.original_name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+  viewFile(file: any): void {
+    console.log('Viewing file:', file);
+    this.uploadService.viewFile(file.filename).subscribe({
+      next: (res: any) => {
+        const fileURL = URL.createObjectURL(res);
+        window.open(fileURL, '_blank');
       },
       error: (err) => {
-        this.errorModalService.showError('Download Failed', 'Unable to download the file. Please try again.');
-      },
-      complete: () => {
-        this.loadingService.stop();
+        this.errorModalService.showError('Error', 'Failed to open the file. Please try again.');
       }
     });
   }

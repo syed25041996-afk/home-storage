@@ -3,7 +3,7 @@ import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 import { authenticateBasic } from '../middleware';
-import { FileModel } from '../models';
+import { FileModel, UserModel } from '../models';
 import { AuthRequest } from '../types';
 
 const router = Router();
@@ -339,27 +339,21 @@ router.get('/upload-files/storage', authenticateBasic, async (req: AuthRequest, 
   }
 });
 
-// Fetch the file url from the authenticated user by file ID
-router.get('/upload-files/:id/download', authenticateBasic, async (req: AuthRequest, res: Response) => {
+// View a file by ID
+router.get('/upload-files/view/:fileName', async (req, res) => {
   try {
-    const fileId = parseInt(req.params.id, 10);
-    const userId = req.user!.id;
+    const { fileName } = req.params;
 
-    const file = await FileModel.findById(fileId);
-    if (!file || file.uploaded_by !== userId) {
+    const filePath = path.join(__dirname, '../../uploads', fileName);
+
+    if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found' });
     }
 
-    const filePath = path.join(uploadsDir, file.filename);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'File not found on server' });
-    }
-
-    // Send the file in response
-    res.download(filePath, file.original_name);
+    res.sendFile(filePath);
   } catch (error) {
-    console.error('Download error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

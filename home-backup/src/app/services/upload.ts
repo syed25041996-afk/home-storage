@@ -63,18 +63,15 @@ export class Upload {
     return this.http.get<any>(`${environment.apiUrl}/upload-files/storage`, { headers });
   }
 
-  // Download a file by ID
-  downloadFile(fileId: number): Observable<Blob> {
+  // View a file by ID (opens in new tab)
+  viewFile(fileId: number): Observable<any> {
     const credentials = localStorage.getItem('credentials');
     let headers = new HttpHeaders();
     if (credentials) {
       headers = headers.set('Authorization', `Basic ${credentials}`);
     }
 
-    return this.http.get(`${environment.apiUrl}/upload-files/${fileId}/download`, {
-      headers,
-      responseType: 'blob'
-    });
+    return this.http.get(`${environment.apiUrl}/upload-files/view/${fileId}`, { headers, responseType: 'blob' });
   }
 
   // Delete a file by ID
