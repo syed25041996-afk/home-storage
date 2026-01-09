@@ -59,99 +59,99 @@ router.post('/upload-files', middleware_1.authenticateBasic, (0, multer_1.defaul
         const files = req.files;
         const uploadedFiles = [];
         // Define allowed file types
-        const allowedMimeTypes = [
-            // Images
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-            // Documents
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.ms-powerpoint',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            // Text files
-            'text/plain',
-            'text/csv',
-            'text/html',
-            // Archives
-            'application/zip',
-            'application/x-rar-compressed',
-            'application/x-tar',
-            'application/gzip',
-            // Audio/Video (optional - comment out if not needed)
-            // 'audio/mpeg',
-            // 'video/mp4',
-            // 'video/mpeg',
-        ];
-        // Define max file size (10MB)
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+        // const allowedMimeTypes = [
+        //   // Images
+        //   'image/jpeg',
+        //   'image/png',
+        //   'image/gif',
+        //   'image/webp',
+        //   'image/svg+xml',
+        //   // Documents
+        //   'application/pdf',
+        //   'application/msword',
+        //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        //   'application/vnd.ms-excel',
+        //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //   'application/vnd.ms-powerpoint',
+        //   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        //   // Text files
+        //   'text/plain',
+        //   'text/csv',
+        //   'text/html',
+        //   // Archives
+        //   'application/zip',
+        //   'application/x-rar-compressed',
+        //   'application/x-tar',
+        //   'application/gzip',
+        //   // Audio/Video (optional - comment out if not needed)
+        //   // 'audio/mpeg',
+        //   // 'video/mp4',
+        //   // 'video/mpeg',
+        // ];
+        // // Define max file size (10MB)
+        // const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
         for (const file of files) {
-            // Check file type
-            if (!allowedMimeTypes.includes(file.mimetype)) {
-                return res.status(400).json({
-                    message: `File type not allowed: ${file.originalname}`,
-                    details: {
-                        filename: file.originalname,
-                        mimeType: file.mimetype,
-                        allowedTypes: allowedMimeTypes.slice(0, 10), // Show first 10 for reference
-                        suggestion: 'Please upload a valid image, document, or archive file'
-                    }
-                });
-            }
-            // Check file size
-            if (file.size > MAX_FILE_SIZE) {
-                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                const maxSizeMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
-                return res.status(400).json({
-                    message: `File too large: ${file.originalname}`,
-                    details: {
-                        filename: file.originalname,
-                        fileSize: `${fileSizeMB} MB`,
-                        maxAllowedSize: `${maxSizeMB} MB`,
-                        suggestion: 'Please compress the file or upload a smaller version'
-                    }
-                });
-            }
-            // Check for potentially dangerous files
-            const dangerousExtensions = ['.exe', '.bat', '.cmd', '.sh', '.js', '.php', '.py'];
-            const fileExtension = path_1.default.extname(file.originalname).toLowerCase();
-            if (dangerousExtensions.includes(fileExtension)) {
-                return res.status(400).json({
-                    message: 'Potentially dangerous file detected',
-                    details: {
-                        filename: file.originalname,
-                        extension: fileExtension,
-                        reason: 'Executable or script files are not allowed for security reasons'
-                    }
-                });
-            }
-            // Validate filename length
-            if (file.originalname.length > 255) {
-                return res.status(400).json({
-                    message: 'Filename too long',
-                    details: {
-                        filename: file.originalname,
-                        length: file.originalname.length,
-                        maxLength: 255,
-                        suggestion: 'Please rename the file with a shorter name'
-                    }
-                });
-            }
-            // Check for empty files
-            if (file.size === 0) {
-                return res.status(400).json({
-                    message: 'Empty file detected',
-                    details: {
-                        filename: file.originalname,
-                        suggestion: 'The file appears to be empty. Please upload a valid file.'
-                    }
-                });
-            }
+            //   // Check file type
+            //   if (!allowedMimeTypes.includes(file.mimetype)) {
+            //     return res.status(400).json({
+            //       message: `File type not allowed: ${file.originalname}`,
+            //       details: {
+            //         filename: file.originalname,
+            //         mimeType: file.mimetype,
+            //         allowedTypes: allowedMimeTypes.slice(0, 10), // Show first 10 for reference
+            //         suggestion: 'Please upload a valid image, document, or archive file'
+            //       }
+            //     });
+            //   }
+            //   // Check file size
+            //   if (file.size > MAX_FILE_SIZE) {
+            //     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            //     const maxSizeMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+            //     return res.status(400).json({
+            //       message: `File too large: ${file.originalname}`,
+            //       details: {
+            //         filename: file.originalname,
+            //         fileSize: `${fileSizeMB} MB`,
+            //         maxAllowedSize: `${maxSizeMB} MB`,
+            //         suggestion: 'Please compress the file or upload a smaller version'
+            //       }
+            //     });
+            //   }
+            // // Check for potentially dangerous files
+            // const dangerousExtensions = ['.exe', '.bat', '.cmd', '.sh', '.js', '.php', '.py'];
+            // const fileExtension = path.extname(file.originalname).toLowerCase();
+            // if (dangerousExtensions.includes(fileExtension)) {
+            //   return res.status(400).json({
+            //     message: 'Potentially dangerous file detected',
+            //     details: {
+            //       filename: file.originalname,
+            //       extension: fileExtension,
+            //       reason: 'Executable or script files are not allowed for security reasons'
+            //     }
+            //   });
+            // }
+            // // Validate filename length
+            // if (file.originalname.length > 255) {
+            //   return res.status(400).json({
+            //     message: 'Filename too long',
+            //     details: {
+            //       filename: file.originalname,
+            //       length: file.originalname.length,
+            //       maxLength: 255,
+            //       suggestion: 'Please rename the file with a shorter name'
+            //     }
+            //   });
+            // }
+            // // Check for empty files
+            // if (file.size === 0) {
+            //   return res.status(400).json({
+            //     message: 'Empty file detected',
+            //     details: {
+            //       filename: file.originalname,
+            //       suggestion: 'The file appears to be empty. Please upload a valid file.'
+            //     }
+            //   });
+            // }
             // If all validations pass, save the file
             const fileRecord = await models_1.FileModel.create(file.filename, file.originalname, file.path, file.size, file.mimetype, req.user.id);
             uploadedFiles.push({
@@ -299,25 +299,19 @@ router.get('/upload-files/storage', middleware_1.authenticateBasic, async (req, 
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-// Fetch the file url from the authenticated user by file ID
-router.get('/upload-files/:id/download', middleware_1.authenticateBasic, async (req, res) => {
+// View a file by ID
+router.get('/upload-files/view/:fileName', async (req, res) => {
     try {
-        const fileId = parseInt(req.params.id, 10);
-        const userId = req.user.id;
-        const file = await models_1.FileModel.findById(fileId);
-        if (!file || file.uploaded_by !== userId) {
+        const { fileName } = req.params;
+        const filePath = path_1.default.join(__dirname, '../../uploads', fileName);
+        if (!fs_1.default.existsSync(filePath)) {
             return res.status(404).json({ message: 'File not found' });
         }
-        const filePath = path_1.default.join(uploadsDir, file.filename);
-        if (!fs_1.default.existsSync(filePath)) {
-            return res.status(404).json({ message: 'File not found on server' });
-        }
-        // Send the file in response
-        res.download(filePath, file.original_name);
+        res.sendFile(filePath);
     }
     catch (error) {
-        console.error('Download error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 // Delete a file by ID

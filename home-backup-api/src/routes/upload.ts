@@ -61,111 +61,111 @@ router.post('/upload-files', authenticateBasic, multer({ storage: storage }).arr
     const uploadedFiles = [];
 
     // Define allowed file types
-    const allowedMimeTypes = [
-      // Images
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'image/svg+xml',
+    // const allowedMimeTypes = [
+    //   // Images
+    //   'image/jpeg',
+    //   'image/png',
+    //   'image/gif',
+    //   'image/webp',
+    //   'image/svg+xml',
 
-      // Documents
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    //   // Documents
+    //   'application/pdf',
+    //   'application/msword',
+    //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    //   'application/vnd.ms-excel',
+    //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //   'application/vnd.ms-powerpoint',
+    //   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 
-      // Text files
-      'text/plain',
-      'text/csv',
-      'text/html',
+    //   // Text files
+    //   'text/plain',
+    //   'text/csv',
+    //   'text/html',
 
-      // Archives
-      'application/zip',
-      'application/x-rar-compressed',
-      'application/x-tar',
-      'application/gzip',
+    //   // Archives
+    //   'application/zip',
+    //   'application/x-rar-compressed',
+    //   'application/x-tar',
+    //   'application/gzip',
 
-      // Audio/Video (optional - comment out if not needed)
-      // 'audio/mpeg',
-      // 'video/mp4',
-      // 'video/mpeg',
-    ];
+    //   // Audio/Video (optional - comment out if not needed)
+    //   // 'audio/mpeg',
+    //   // 'video/mp4',
+    //   // 'video/mpeg',
+    // ];
 
-    // Define max file size (10MB)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+    // // Define max file size (10MB)
+    // const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
     for (const file of files) {
-      // Check file type
-      if (!allowedMimeTypes.includes(file.mimetype)) {
-        return res.status(400).json({
-          message: `File type not allowed: ${file.originalname}`,
-          details: {
-            filename: file.originalname,
-            mimeType: file.mimetype,
-            allowedTypes: allowedMimeTypes.slice(0, 10), // Show first 10 for reference
-            suggestion: 'Please upload a valid image, document, or archive file'
-          }
-        });
-      }
+      //   // Check file type
+      //   if (!allowedMimeTypes.includes(file.mimetype)) {
+      //     return res.status(400).json({
+      //       message: `File type not allowed: ${file.originalname}`,
+      //       details: {
+      //         filename: file.originalname,
+      //         mimeType: file.mimetype,
+      //         allowedTypes: allowedMimeTypes.slice(0, 10), // Show first 10 for reference
+      //         suggestion: 'Please upload a valid image, document, or archive file'
+      //       }
+      //     });
+      //   }
 
-      // Check file size
-      if (file.size > MAX_FILE_SIZE) {
-        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        const maxSizeMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+      //   // Check file size
+      //   if (file.size > MAX_FILE_SIZE) {
+      //     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      //     const maxSizeMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
 
-        return res.status(400).json({
-          message: `File too large: ${file.originalname}`,
-          details: {
-            filename: file.originalname,
-            fileSize: `${fileSizeMB} MB`,
-            maxAllowedSize: `${maxSizeMB} MB`,
-            suggestion: 'Please compress the file or upload a smaller version'
-          }
-        });
-      }
+      //     return res.status(400).json({
+      //       message: `File too large: ${file.originalname}`,
+      //       details: {
+      //         filename: file.originalname,
+      //         fileSize: `${fileSizeMB} MB`,
+      //         maxAllowedSize: `${maxSizeMB} MB`,
+      //         suggestion: 'Please compress the file or upload a smaller version'
+      //       }
+      //     });
+      //   }
 
-      // Check for potentially dangerous files
-      const dangerousExtensions = ['.exe', '.bat', '.cmd', '.sh', '.js', '.php', '.py'];
-      const fileExtension = path.extname(file.originalname).toLowerCase();
+      // // Check for potentially dangerous files
+      // const dangerousExtensions = ['.exe', '.bat', '.cmd', '.sh', '.js', '.php', '.py'];
+      // const fileExtension = path.extname(file.originalname).toLowerCase();
 
-      if (dangerousExtensions.includes(fileExtension)) {
-        return res.status(400).json({
-          message: 'Potentially dangerous file detected',
-          details: {
-            filename: file.originalname,
-            extension: fileExtension,
-            reason: 'Executable or script files are not allowed for security reasons'
-          }
-        });
-      }
+      // if (dangerousExtensions.includes(fileExtension)) {
+      //   return res.status(400).json({
+      //     message: 'Potentially dangerous file detected',
+      //     details: {
+      //       filename: file.originalname,
+      //       extension: fileExtension,
+      //       reason: 'Executable or script files are not allowed for security reasons'
+      //     }
+      //   });
+      // }
 
-      // Validate filename length
-      if (file.originalname.length > 255) {
-        return res.status(400).json({
-          message: 'Filename too long',
-          details: {
-            filename: file.originalname,
-            length: file.originalname.length,
-            maxLength: 255,
-            suggestion: 'Please rename the file with a shorter name'
-          }
-        });
-      }
+      // // Validate filename length
+      // if (file.originalname.length > 255) {
+      //   return res.status(400).json({
+      //     message: 'Filename too long',
+      //     details: {
+      //       filename: file.originalname,
+      //       length: file.originalname.length,
+      //       maxLength: 255,
+      //       suggestion: 'Please rename the file with a shorter name'
+      //     }
+      //   });
+      // }
 
-      // Check for empty files
-      if (file.size === 0) {
-        return res.status(400).json({
-          message: 'Empty file detected',
-          details: {
-            filename: file.originalname,
-            suggestion: 'The file appears to be empty. Please upload a valid file.'
-          }
-        });
-      }
+      // // Check for empty files
+      // if (file.size === 0) {
+      //   return res.status(400).json({
+      //     message: 'Empty file detected',
+      //     details: {
+      //       filename: file.originalname,
+      //       suggestion: 'The file appears to be empty. Please upload a valid file.'
+      //     }
+      //   });
+      // }
 
       // If all validations pass, save the file
       const fileRecord = await FileModel.create(
