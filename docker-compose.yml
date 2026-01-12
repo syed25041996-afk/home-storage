@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  api:
+    build: ./home-backup-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: home_backup
+      DB_USER: homeuser
+      DB_PASSWORD: homepass
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads  # Assuming uploads are stored here
+
+  frontend:
+    build: ./home-backup
+    depends_on:
+      - api
+    ports:
+      - "4200:4200"

@@ -1,4 +1,4 @@
-FROM node
+FROM node:18-alpine as build
 
 WORKDIR /app
 
@@ -11,8 +11,16 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Expose Angular dev server port
-EXPOSE 4200
+# Build the application
+RUN npm run build -- --configuration production
 
-# Start Angular dev server
-CMD ["npm", "start", "--", "--host", "0.0.0.0", "--port", "4200"]
+FROM nginx:alpine
+
+# Copy built app from build stage
+COPY --from=build /app/dist/home-backup /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
