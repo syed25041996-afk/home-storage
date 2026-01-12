@@ -15,7 +15,7 @@ RUN npm run build -- --configuration production
 FROM nginx:alpine
 
 # Copy Angular build to Nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist/home-backup /usr/share/nginx/html
 
 # Optional custom Nginx config
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
