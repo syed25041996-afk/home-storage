@@ -1,66 +1,26 @@
-name: 🚀 Deploy
-on: [push]
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main, master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: 🔐 Setup SSH Key
-      run: |
-        # Clean setup
-        rm -rf ~/.ssh
-        mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-        
-        # Write private key exactly as in secrets
-        # NO modifications, NO sed commands
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        
-        # Test the key file
-        echo "=== Key Validation ==="
-        ls -la ~/.ssh/id_rsa
-        ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null && echo "✅ Key is valid" || echo "❌ Key is invalid"
-        
-        # Add to known_hosts
-        ssh-keyscan -p ${{ secrets.NGROK_PORT }} ${{ secrets.NGROK_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-        
-    - name: 🔧 Debug Connection
-      run: |
-        echo "=== Testing Connection ==="
-        echo "Host: ${{ secrets.NGROK_HOST }}"
-        echo "Port: ${{ secrets.NGROK_PORT }}"
-        
-        # Simple test
-        timeout 10 ssh -p ${{ secrets.NGROK_PORT }} \
-          -i ~/.ssh/id_rsa \
-          -o IdentitiesOnly=yes \
-          -o BatchMode=yes \
-          -o ConnectTimeout=5 \
-          -o StrictHostKeyChecking=no \
-          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
-          "echo 'Hello from GitHub Actions'" 2>&1
-        
-        if [ $? -eq 0 ]; then
-          echo "✅ Connection successful!"
-        else
-          echo "❌ Connection failed"
-          echo "=== Debug Info ==="
-          # Show key fingerprint
-          ssh-keygen -l -f ~/.ssh/id_rsa 2>/dev/null || echo "Cannot read key"
-        fi
-        
-    - name: 🚀 Deploy Application
-      if: success()
-      run: |
-        echo "Starting deployment..."
-        
-        # Simple direct command
-        ssh -p ${{ secrets.NGROK_PORT }} \
-          -i ~/.ssh/id_rsa \
-          -o IdentitiesOnly=yes \
-          -o StrictHostKeyChecking=no \
-          ${{ secrets.SSH_USERNAME }}@${{ secrets.NGROK_HOST }} \
-          "cd /home/home/apps/home-storage && bash deploy.sh"
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null\n" > ~/.ssh/config
+
+      - name: Run command on server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              home@0.tcp.in.ngrok.io -p 16809 \
+              "echo '✅ Secure deployment from GitHub Actions'"
