@@ -11,9 +11,6 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Copy .env file explicitly
-COPY .env .env
-
 # Build if using TypeScript
 RUN npm run build
 
