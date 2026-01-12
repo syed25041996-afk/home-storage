@@ -7,6 +7,10 @@ echo "🚀 Starting deployment of Home Backup application..."
 # Navigate to the project directory (assuming script is run from project root)
 cd "$(dirname "$0")"
 
+# Pull latest changes from the repository
+echo "📥 Pulling latest changes from Git repository..."
+git pull origin main
+
 # Stop and remove existing containers
 echo "🛑 Stopping existing containers..."
 docker-compose down
