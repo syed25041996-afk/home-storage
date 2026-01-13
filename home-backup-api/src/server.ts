@@ -51,12 +51,7 @@ const specs = swaggerJsdoc(options);
 // ✅ FIX: Allow both localhost AND your IP
 const corsOptions = {
   origin: [
-    'http://localhost:4200',          // Localhost
-    'http://192.168.1.108:4200',      // Your local IP - THIS WAS MISSING!
-    'http://localhost:80',            // Nginx localhost
-    'http://192.168.1.108:80',
-    'https://famstore.loophole.site',        // Nginx IP
-    /\.ngrok\.io$/                    // All ngrok domains
+    "*"                    // All ngrok domains
   ],
   credentials: true,                  // ✅ IMPORTANT for cookies/sessions
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
