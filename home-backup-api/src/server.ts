@@ -51,13 +51,14 @@ const specs = swaggerJsdoc(options);
 // ✅ FIX: Allow both localhost AND your IP
 const corsOptions = {
   origin: [
-    "*"                    // All ngrok domains
+    "*",                // ✅ Allow all origins for testing; restrict in production
   ],
   credentials: true,                  // ✅ IMPORTANT for cookies/sessions
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 };
 
-app.use(cors(corsOptions));
+// Allow CORS for all origins
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
