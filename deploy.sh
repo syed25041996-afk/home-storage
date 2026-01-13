@@ -46,14 +46,10 @@ else
 fi
 
 # Check frontend (basic check)
-if curl -f http://localhost > /dev/null 2>&1; then
+if curl -f http://localhost:4200 > /dev/null 2>&1; then
     echo "✅ Frontend is accessible"
 else
     echo "❌ Frontend check failed"
 fi
 
 echo "🎉 Deployment completed successfully!"
-echo "📋 Services:"
-echo "  - Frontend: http://localhost"
-echo "  - API: http://localhost:3000"
-echo "  - API Docs: http://localhost:3000/api-docs"
