@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://192.168.1.108:3000/api'
+    apiUrl: 'https://home.tail2b1f38.ts.net:3000/api',
 };
