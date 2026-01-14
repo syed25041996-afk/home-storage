@@ -50,15 +50,14 @@ const options = {
 const specs = swaggerJsdoc(options);
 // ✅ FIX: Allow both localhost AND your IP
 const corsOptions = {
-  origin: [
-    "*",                // ✅ Allow all origins for testing; restrict in production
-  ],
-  credentials: true,                  // ✅ IMPORTANT for cookies/sessions
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  // This is the URL of your FRONTEND (where the user types in the browser)
+  origin: 'https://home.tail2b1f38.ts.net',
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true
 };
 
 // Allow CORS for all origins
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
