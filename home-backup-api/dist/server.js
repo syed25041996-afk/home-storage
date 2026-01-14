@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -49,14 +48,14 @@ const options = {
 };
 const specs = (0, swagger_jsdoc_1.default)(options);
 // ✅ FIX: Allow both localhost AND your IP
-const corsOptions = {
-    origin: [
-        "*" // All ngrok domains
-    ],
-    credentials: true, // ✅ IMPORTANT for cookies/sessions
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-};
-app.use((0, cors_1.default)(corsOptions));
+// const corsOptions = {
+//   // This is the URL of your FRONTEND (where the user types in the browser)
+//   origin: 'https://home.tail2b1f38.ts.net',
+//   methods: 'GET,POST,PUT,DELETE',
+//   credentials: true
+// };
+// Allow CORS for all origins
+// app.use(cors(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Swagger UI
