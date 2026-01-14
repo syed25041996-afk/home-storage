@@ -66,7 +66,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/api', uploadRoutes);
+app.use('/', uploadRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
