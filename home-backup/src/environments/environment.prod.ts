@@ -1,4 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://home.tail2b1f38.ts.net:3000/api',
+    // Use a relative path so Tailscale's path-based routing works automatically
+    apiUrl: '/api'
 };
